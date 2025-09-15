@@ -1,698 +1,865 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bus Pitch & Roll Display + Battery Monitor</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-  :root{
-    --good:#2ecc71;
-    --warn:#ff9f1a;
-    --bad:#ff5c5c;
-    --empty:#9aa6ad;
-    --accent:#4dd0e1;
-    --text:#e6eef3;
-    --muted:#9fb0bd;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatApp</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  body {
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-  }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-  .panel {
-    width: 207.78mm;
-    height: 69.80mm;
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-  }
-  .active-area {
-    width: 191.08mm;
-    height: 60.40mm;
-    background: #000;
-    border: 1px solid white;
-    position: absolute;
-    top: 4.70mm;
-    left: 8.35mm;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    padding: 0;
-    box-sizing: border-box;
-  }
+        /* Room Code Screen */
+        .room-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
 
-  .top-row {
-    display: flex;
-    justify-content: flex-start;
-    align-items: stretch;
-    height: 30.20mm;
-  }
+        .room-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-  /* Data panel (Tank + Pitch & Roll) */
-  .data-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    height: 117%;
-    padding: 10px;
-    box-sizing: border-box;
-    transform: scale(0.85);
-    transform-origin: top left;
-  }
+        .room-card h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-  /* Tank */
-  .tank-container { display: flex; flex-direction: column; align-items: center; font-family: sans-serif; transform: scale(0.9); }
-  .tank { width: 100px; height: 50px; border: 2px solid white; border-radius: 4px; position: relative; overflow: hidden; background: #222; transition: transform 0.4s ease; }
-  .water-surface { position: absolute; bottom: 0; left: 0; width: 100%; background: blue; height: 100%; clip-path: polygon(0 100%,100% 100%,100% 0,0 0); transition: clip-path 0.3s ease; }
-  .hole { position: absolute; bottom: 0; left: 0; width: 6px; height: 12px; background: black; }
-  .tank-warning { position: absolute; top: 50px; margin-top: 5px; background: rgba(255,165,0,0.5); border: 1px solid orange; padding: 3px 8px; border-radius: 10px; font-size: 10px; display: none; color: black; }
-  .tank-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: white; font-weight: bold; font-size: 10px; text-align: center; }
-  #tankPercent { font-size: 20px; font-weight: bold; }
+        .room-input {
+            width: 300px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-  /* Pitch & Roll */
-  .indicator { display: flex; flex-direction: column; align-items: center; color: white; font-family: sans-serif; }
-  .icon-wrapper { display: flex; flex-direction: column; align-items: center; transition: transform 0.4s ease; }
-  .pitch-bus-img { height: 64px; width: 64px; }
-  .roll-bus-img { height: 50px; width: 50px; margin-top: 13px; }
-  .ground-line { width: 70px; height: 4px; background: white; margin-top: -9px; margin-bottom: 5px; }
+        .room-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
 
-  /* Battery panel */
-  .battery-panel { width: 500px; height: 30.20mm; background: rgba(0,0,0,1); border: 2px solid #212121; display: flex; justify-content: center; align-items: center; color: white; font-family: sans-serif; font-size: 12px; box-sizing: border-box; margin-left: -22px; padding: 8px; overflow: hidden; }
-  .battery-content { width: 100%; height: 100%; display: flex; gap: 6px; }
-  .battery-gauge { width: 80px; display: flex; flex-direction: column; align-items: center; }
-  .gauge-container { width: 60px; height: 60px; margin-bottom: 4px; }
+        .join-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
 
-  .battery-grid { flex: 1; display: grid; grid-template-columns: repeat(4,1fr); gap: 4px; }
-  .battery-module { background: linear-gradient(0deg,#08101a44,#08131622); border-radius: 4px; padding: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; }
-  .module-icon { font-size: 20px; margin-bottom: 3px; }
-  .module-number { position: absolute; top: 2px; right: 2px; font-size: 8px; font-weight: bold; background: rgba(0,0,0,0.7); border-radius: 50%; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; color: white; }
-  .module-percent { font-size: 10px; font-weight: bold; }
-  .module-details { font-size: 7px; color: var(--muted); }
+        .join-btn:hover {
+            transform: scale(1.05);
+        }
 
-  .power-stats { width: 120px; display: flex; flex-direction: column; gap: 2px; font-size: 9px; }
-  .stat-item { background: rgba(255,255,255,0.05); padding: 3px 4px; border-radius: 3px; display: flex; justify-content: space-between; }
-  .stat-label { color: var(--muted); }
-  .stat-value { font-weight: bold; }
+        /* Chat Interface */
+        .chat-container {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
 
-  /* Time + temp overlays */
-  .time-display { position: absolute; top: 4px; right: 6px; color: var(--accent); font-weight: 700; font-size: 14px; }
-  .temp-display { position: absolute; bottom: 4px; right: 6px; color: #ff6600; font-weight: 600; font-size: 12px; }
-</style>
+        /* Top Bar */
+        .top-bar {
+            background: #2c2c2c;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #444;
+        }
+
+        .channel-selector {
+            position: relative;
+        }
+
+        .channel-name {
+            background: #3a3a3a;
+            color: white;
+            border: none;
+            padding: 8px 40px 8px 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            appearance: none;
+        }
+
+        .channel-name::after {
+            content: '▼';
+            position: absolute;
+            right: 15px;
+            pointer-events: none;
+        }
+
+        .account-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .account-btn:hover {
+            background: #357abd;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+
+        .messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: #2c2c2c;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+            background: #4a90e2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+            max-width: calc(100% - 55px);
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            flex-wrap: wrap;
+        }
+
+        .message-username {
+            font-weight: bold;
+            color: #4a90e2;
+            margin-right: 10px;
+        }
+
+        .message-timestamp {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .message-bubble {
+            background: #3a3a3a;
+            padding: 12px 16px;
+            border-radius: 18px;
+            border-top-left-radius: 4px;
+            margin-top: 2px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .message-bubble code {
+            background: #2c2c2c;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .message-bubble pre {
+            background: #2c2c2c;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+
+        .message-bubble strong {
+            font-weight: bold;
+        }
+
+        .message-bubble em {
+            font-style: italic;
+        }
+
+        .message-image {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .message-image:hover {
+            transform: scale(1.02);
+        }
+
+        .emoji {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin: 0 2px;
+        }
+
+        /* Input Bar */
+        .input-bar {
+            background: #2c2c2c;
+            padding: 15px 20px;
+            border-top: 1px solid #444;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .message-input {
+            flex: 1;
+            background: #3a3a3a;
+            border: 1px solid #555;
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .message-input:focus {
+            border-color: #4a90e2;
+        }
+
+        .input-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .input-btn:hover {
+            background: #357abd;
+            transform: scale(1.05);
+        }
+
+        .image-input {
+            display: none;
+        }
+
+        /* Account Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #2c2c2c;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid #444;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            background: #3a3a3a;
+            color: white;
+        }
+
+        .profile-preview {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .profile-preview img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-btn.primary {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #555;
+            color: white;
+        }
+
+        /* Bot Message Styling */
+        .message.bot .message-username {
+            color: #ff6b6b;
+        }
+
+        .message.bot .message-avatar {
+            background: #ff6b6b;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 0 15px;
+            }
+
+            .messages-container {
+                padding: 15px;
+            }
+
+            .input-bar {
+                padding: 10px 15px;
+            }
+
+            .room-card {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            .room-card h1 {
+                font-size: 2rem;
+            }
+
+            .room-input {
+                width: 100%;
+                max-width: 280px;
+            }
+
+            .message-avatar {
+                width: 35px;
+                height: 35px;
+            }
+
+            .message-bubble {
+                border-radius: 15px;
+            }
+
+            .modal-content {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="panel">
-    <div class="active-area">
-      <div class="time-display" id="timeDisplay">06:00</div>
-      <div class="temp-display" id="tempDisplay">15°C</div>
-
-      <div class="top-row">
-        <div class="data-panel">
-          <!-- Tank -->
-          <div class="tank-container">
-            <div class="tank" id="tank">
-              <div class="water-surface" id="waterSurface"></div>
-              <div class="hole"></div>
-            </div>
-            <div class="tank-text">Water Tank<br><span id="tankPercent">(0%)</span></div>
-            <div class="tank-warning" id="tankWarning">⚠ Outlet Dry</div>
-          </div>
-          <!-- Pitch -->
-          <div class="indicator">
-            <div class="icon-wrapper" id="pitchContainer">
-              <img src="https://img.icons8.com/external-xnimrodx-lineal-xnimrodx/64/FFFFFF/external-bus-resort-xnimrodx-lineal-xnimrodx.png" class="pitch-bus-img">
-              <div class="ground-line"></div>
-            </div>
-            <div id="pitchValue">Pitch: 0°</div>
-          </div>
-          <!-- Roll -->
-          <div class="indicator">
-            <div class="icon-wrapper" id="rollContainer">
-              <img src="https://img.icons8.com/pixels/64/FFFFFF/bus.png" class="roll-bus-img">
-              <div class="ground-line"></div>
-            </div>
-            <div id="rollValue">Roll: 0°</div>
-          </div>
+    <!-- Room Code Screen -->
+    <div class="room-screen" id="roomScreen">
+        <div class="room-card">
+            <h1>🚀 ChatApp</h1>
+            <p style="margin-bottom: 30px; opacity: 0.9;">Enter room code to join the conversation</p>
+            <input type="text" class="room-input" id="roomCodeInput" placeholder="Room Code" maxlength="10">
+            <br>
+            <button class="join-btn" onclick="joinRoom()">Join Room</button>
         </div>
-
-        <!-- Battery -->
-        <div class="battery-panel">
-          <div class="battery-content">
-            <div class="battery-gauge">
-              <div class="gauge-container">
-                <svg width="60" height="60" viewBox="0 0 60 60">
-                  <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#2ecc71"/><stop offset="0.6" stop-color="#ff9f1a"/><stop offset="1" stop-color="#ff5c5c"/></linearGradient></defs>
-                  <circle cx="30" cy="30" r="22" fill="#071015"/>
-                  <path id="gaugeArc" d="" stroke="url(#g1)" stroke-width="4" stroke-linecap="round" fill="none" transform="rotate(-90 30 30)"/>
-                  <circle cx="30" cy="30" r="16" fill="#071014"/>
-                  <text id="gaugeText" x="30" y="32" fill="#eaf6f8" font-size="10" font-weight="700" text-anchor="middle">--%</text>
-                  <text x="30" y="40" fill="#9fb0bd" font-size="6" text-anchor="middle">Total SoC</text>
-                </svg>
-              </div>
-            </div>
-            <div class="battery-grid" id="batteryGrid"></div>
-            <div class="power-stats">
-              <div class="stat-item"><span class="stat-label">Net:</span><span class="stat-value" id="netPower">-850W</span></div>
-              <div class="stat-item"><span class="stat-label">Input:</span><span class="stat-value" id="inputPower">+800W</span></div>
-              <div class="stat-item"><span class="stat-label">Load:</span><span class="stat-value" id="loadPower">-1650W</span></div>
-              <div class="stat-item"><span class="stat-label">Bank:</span><span class="stat-value" id="bankVoltage">48.2V</span></div>
-              <div class="stat-item"><span class="stat-label">Current:</span><span class="stat-value" id="bankCurrent">-17.7A</span></div>
-              <div class="stat-item"><span class="stat-label">Est:</span><span class="stat-value" id="estTime">3h45m</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom Panels -->
-      <div class="bottom-row">
-      </div>
     </div>
-  </div>
-  <script>
-// -----------------------------
-// Simulation state & variables
-// -----------------------------
-let pitch = 0;
-let roll = 0;
-let waterLevel = 17; // % fill level
-let pitchDir = 1;
-let rollDir = 1;
-
-let currentTime = new Date();
-currentTime.setHours(6, 0, 0, 0);
-let simulationMinutes = 0;
-
-let batteries = [
-  { id: 1, soc: +(60 + Math.random() * 40).toFixed(1), volts: 48.2, temp: 22 },
-  { id: 2, soc: +(60 + Math.random() * 40).toFixed(1), volts: 48.1, temp: 23 },
-  { id: 3, soc: +(60 + Math.random() * 40).toFixed(1), volts: 47.9, temp: 21 },
-  { id: 4, soc: +(60 + Math.random() * 40).toFixed(1), volts: 48.0, temp: 22 }
-];
-
-let sim = {
-  inputWatts: 800,
-  loadWatts: -1650,
-  chargeSource: 'solar', // 'solar', 'generator', 'mains', 'none'
-  loads: {
-    lights: 120,
-    fridge: 180,
-    hvac: 850,
-    electronics: 95,
-    other: 405
-  }
-};
-
-let powerHistory = [];
-let warnings = [];
-let spikeCount = 0;
-
-// track last time we had non-zero input from the source
-let lastInputTime = Date.now();
-// grace period (ms) before showing No Input
-const INPUT_GRACE_MS = 5000;
-
-// -----------------------------
-// Helper / display functions
-// -----------------------------
-function getTotalSoC() {
-  return +(batteries.reduce((sum, b) => sum + b.soc, 0) / batteries.length).toFixed(1);
-}
-
-function getBankVoltage() {
-  return +(batteries.reduce((sum, b) => sum + b.volts, 0) / batteries.length).toFixed(1);
-}
-
-function computePower() {
-  return Math.round(sim.inputWatts + sim.loadWatts);
-}
-
-function getTotalCurrent() {
-  const v = getBankVoltage() || 48;
-  return +(computePower() / v).toFixed(1);
-}
-
-// estimate remaining discharge time (for 'Est' field)
-function estimateTimeLeft() {
-  const usableWh = 4000 * (getTotalSoC() / 100);
-  const draw = Math.max(50, -sim.loadWatts);
-  const hours = usableWh / draw;
-  if (hours > 100) return '>100h';
-  if (hours < 0.02) return '<15m';
-  const h = Math.floor(hours);
-  const m = Math.round((hours - h) * 60);
-  return `${h}h${m}m`;
-}
-
-// -----------------------------
-// Charge source & charge time (synchronised)
-// - uses sim.inputWatts and sim.chargeSource
-// - shows "No Input" if no input for > INPUT_GRACE_MS
-// -----------------------------
-function calculateChargeTime() {
-  const soc = getTotalSoC();
-
-  // If the source is 'none' OR inputWatts is 0 OR last input older than grace, treat as no input
-  if (sim.chargeSource === 'none' || sim.inputWatts <= 0 || (Date.now() - lastInputTime) > INPUT_GRACE_MS) {
-    // Keep the DOM element size stable but hide the text (we use placeholder)
-    const el = document.getElementById('chargeTime');
-    el.textContent = '00h00m'; // placeholder to preserve width
-    el.style.visibility = 'hidden';
-    return 'No Input';
-  }
-
-  // Charging — use sim.inputWatts only (current source)
-  const batteryCapacityWh = 4000 * 4; // 4 kWh per module * 4 modules = 16000 Wh
-  const remainingWh = batteryCapacityWh * ((100 - soc) / 100);
-  const hours = remainingWh / sim.inputWatts;
-
-  let display;
-  if (hours > 48) display = '>2d';
-  else if (hours < 0.1) display = '<6m';
-  else {
-    const h = Math.floor(hours);
-    const m = Math.round((hours - h) * 60);
-    display = `${h}h${m}m`;
-  }
-
-  const el = document.getElementById('chargeTime');
-  el.textContent = display;
-  el.style.visibility = 'visible';
-  return display;
-}
-
-// Update the charge source UI only (source decided elsewhere)
-function updateChargeSourceUI() {
-  const sourceIcon = document.getElementById('sourceIcon');
-  const sourceName = document.getElementById('sourceName');
-  const sourceDetails = document.getElementById('sourceDetails');
-
-  switch (sim.chargeSource) {
-    case 'solar':
-      sourceIcon.textContent = '☀';
-      sourceIcon.style.background = '#ffa500';
-      sourceName.textContent = 'Solar';
-      sourceDetails.textContent = `+${sim.inputWatts}W`;
-      sourceDetails.style.visibility = 'visible';
-      break;
-    case 'generator':
-      sourceIcon.textContent = '⚡';
-      sourceIcon.style.background = '#ff6b6b';
-      sourceName.textContent = 'Generator';
-      sourceDetails.textContent = `+${sim.inputWatts}W`;
-      sourceDetails.style.visibility = 'visible';
-      break;
-    case 'mains':
-      sourceIcon.textContent = '🔌';
-      sourceIcon.style.background = '#4ecdc4';
-      sourceName.textContent = 'Mains';
-      sourceDetails.textContent = `+${sim.inputWatts}W`;
-      sourceDetails.style.visibility = 'visible';
-      break;
-    case 'none':
-    default:
-      sourceIcon.textContent = '✖';
-      sourceIcon.style.background = '#555';
-      sourceName.textContent = 'No Connection';
-      // placeholder so width doesn't collapse
-      sourceDetails.textContent = '0W';
-      sourceDetails.style.visibility = 'hidden';
-      break;
-  }
-}
-
-// -----------------------------
-// Battery modules rendering & gauge
-// -----------------------------
-function getColorVar(soc) {
-  if (soc <= 2) return { fill: 'var(--empty)', text: 'white' };
-  if (soc < 20) return { fill: 'var(--bad)', text: 'white' };
-  if (soc < 45) return { fill: 'var(--warn)', text: '#2a1500' };
-  return { fill: 'var(--good)', text: '#023018' };
-}
-
-function getBatteryIcon(soc) {
-  if (soc <= 10) return 'fas fa-battery-empty';
-  if (soc <= 25) return 'fas fa-battery-quarter';
-  if (soc <= 50) return 'fas fa-battery-half';
-  if (soc <= 75) return 'fas fa-battery-three-quarters';
-  return 'fas fa-battery-full';
-}
-
-function renderBatteryModules() {
-  const grid = document.getElementById('batteryGrid');
-  if (!grid) return;
-  grid.innerHTML = '';
-
-  batteries.forEach(b => {
-    const module = document.createElement('div');
-    module.className = 'battery-module';
-
-    const color = getColorVar(b.soc);
-    const iconClass = getBatteryIcon(b.soc);
-
-    module.innerHTML = `
-      <i class="module-icon ${iconClass}" style="color: ${color.fill};"></i>
-      <div class="module-number">${b.id}</div>
-      <div class="module-percent">${b.soc.toFixed(1)}%</div>
-      <div class="module-details">${b.volts}V<br>${b.temp}°C</div>
-    `;
-
-    grid.appendChild(module);
-  });
-}
-
-function updateGauge(soc) {
-  const arc = document.getElementById('gaugeArc');
-  if (!arc) return;
-  const pct = Math.max(0, Math.min(100, soc));
-  const angle = pct / 100 * 360;
-  const r = 22;
-  const cx = 30, cy = 30;
-
-  if (angle === 0) {
-    arc.setAttribute('d', '');
-    return;
-  }
-
-  const large = angle > 180 ? 1 : 0;
-  const end = polarToCartesian(cx, cy, r, angle);
-  const start = polarToCartesian(cx, cy, r, 0);
-  const d = `M ${start.x} ${start.y} A ${r} ${r} 0 ${large} 1 ${end.x} ${end.y}`;
-  arc.setAttribute('d', d);
-}
-
-function polarToCartesian(cx, cy, r, angleDeg) {
-  const a = (angleDeg - 90) * Math.PI / 180.0;
-  return { x: cx + (r * Math.cos(a)), y: cy + (r * Math.sin(a)) };
-}
-
-// -----------------------------
-// Power spike detection & rendering
-// -----------------------------
-function addToPowerHistory(power) {
-  powerHistory.push(power);
-  if (powerHistory.length > 60) { // last ~60 samples
-    powerHistory.shift();
-  }
-}
-
-function detectSpike(currentPower) {
-  if (powerHistory.length < 10) return false;
-  const recent = powerHistory.slice(-10);
-  const avg = recent.reduce((sum, p) => sum + p, 0) / recent.length;
-  const threshold = Math.abs(avg) * 0.3; // 30% deviation
-  return Math.abs(currentPower - avg) > threshold && Math.abs(currentPower - avg) > 200;
-}
-
-function renderPowerSpikes() {
-  const barsContainer = document.getElementById('spikeBars');
-  if (!barsContainer) return;
-  barsContainer.innerHTML = '';
-
-  const recentData = powerHistory.slice(-30);
-  const maxPower = Math.max(...recentData.map(Math.abs), 1000);
-
-  recentData.forEach(power => {
-    const bar = document.createElement('div');
-    bar.className = 'spike-bar';
-    const height = Math.abs(power) / maxPower * 36; // scaled
-    bar.style.height = height + 'px';
-
-    if (Math.abs(power) > 2000) bar.style.background = 'var(--bad)';
-    else if (Math.abs(power) > 1500) bar.style.background = 'var(--warn)';
-    else bar.style.background = 'var(--accent)';
-
-    barsContainer.appendChild(bar);
-  });
-
-  // update stats text (safe guard when no data)
-  if (powerHistory.length > 0) {
-    const maxPowerValue = Math.max(...powerHistory);
-    const minPowerValue = Math.min(...powerHistory);
-    const avgPowerValue = Math.round(powerHistory.reduce((s, p) => s + p, 0) / powerHistory.length);
-    const setText = id => { const el = document.getElementById(id); if (el) el.textContent = arguments[1]; };
-
-    const peakEl = document.getElementById('peakPower');
-    if (peakEl) peakEl.textContent = maxPowerValue + 'W';
-    const minEl = document.getElementById('minPower');
-    if (minEl) minEl.textContent = minPowerValue + 'W';
-    const avgEl = document.getElementById('avgPower');
-    if (avgEl) avgEl.textContent = avgPowerValue + 'W';
-    const spikeEl = document.getElementById('spikeCount');
-    if (spikeEl) spikeEl.textContent = spikeCount;
-  }
-}
-
-// -----------------------------
-// Warnings rendering
-// -----------------------------
-function addWarning(text, type = 'warning') {
-  const now = Date.now();
-  // avoid duplicate within 30s
-  if (warnings.some(w => w.text === text && (now - w.timestamp) < 30000)) return;
-
-  warnings.unshift({
-    text,
-    type,
-    timestamp: now,
-    time: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })
-  });
-
-  if (warnings.length > 8) warnings.pop();
-}
-
-function renderWarnings() {
-  const warningsList = document.getElementById('warningsList');
-  if (!warningsList) return;
-  warningsList.innerHTML = '';
-
-  if (warnings.length === 0) {
-    const noWarnings = document.createElement('div');
-    noWarnings.className = 'no-warnings';
-    noWarnings.textContent = 'All systems nominal';
-    warningsList.appendChild(noWarnings);
-    return;
-  }
-
-  warnings.forEach(w => {
-    const item = document.createElement('div');
-    item.className = `warning-item warning-${w.type}`;
-    item.innerHTML = `<div class="warning-text">${w.text}</div><div class="warning-time">${w.time}</div>`;
-    warningsList.appendChild(item);
-  });
-}
-
-// -----------------------------
-// Loads breakdown (no chargeTime update here)
-// -----------------------------
-function updateLoadBreakdown() {
-  const timeVariation = Math.sin((simulationMinutes / 60) * Math.PI / 4); // 4-hour cycle
-  sim.loads.lights = Math.round(120 + timeVariation * 30);
-  sim.loads.fridge = Math.round(180 + Math.sin(simulationMinutes / 30) * 20);
-  sim.loads.hvac = Math.round(850 + timeVariation * 300 + Math.random() * 100);
-  sim.loads.electronics = Math.round(95 + Math.random() * 40);
-
-  const totalLoads = Object.values(sim.loads).reduce((s, l) => s + l, 0);
-  sim.loads.other = Math.abs(sim.loadWatts) - (totalLoads - sim.loads.other);
-  sim.loads.other = Math.max(0, sim.loads.other);
-
-  const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
-  setText('lightsLoad', `-${sim.loads.lights}W`);
-  setText('fridgeLoad', `-${sim.loads.fridge}W`);
-  setText('hvacLoad', `-${sim.loads.hvac}W`);
-  setText('electronicsLoad', `-${sim.loads.electronics}W`);
-  setText('otherLoad', `-${Math.round(sim.loads.other)}W`);
-}
-
-// -----------------------------
-// Tank + indicators
-// -----------------------------
-function updateTank(pitchAngle) {
-  const tank = document.querySelector('#tankContainer .tank') || document.getElementById('tank');
-  const waterSurface = document.getElementById('waterSurface');
-  const warning = document.getElementById('tankWarning');
-  if (!tank || !waterSurface || !warning) return;
-
-  tank.style.transform = `rotate(${pitchAngle}deg)`;
-
-  const maxTilt = 15;
-  const tiltPercent = Math.max(-maxTilt, Math.min(maxTilt, pitchAngle)) / maxTilt * 20;
-  const levelHeight = 100 - waterLevel;
-  waterSurface.style.clipPath = `polygon(0% 100%, 100% 100%, 100% ${levelHeight - tiltPercent}%, 0% ${levelHeight + tiltPercent}%)`;
-
-  const tankHeight = 50;
-  const waterHeightPx = (waterLevel / 100) * tankHeight;
-  const effectiveWaterHeight = waterHeightPx - (Math.sin(pitchAngle * Math.PI / 180) * (tank.offsetWidth / 2));
-  warning.style.display = effectiveWaterHeight <= 0 ? 'block' : 'none';
-}
-
-// -----------------------------
-// Colour helpers for pitch/roll text
-// -----------------------------
-function updateColor(element, angle) {
-  if (!element) return;
-  if (Math.abs(angle) < 5) element.style.color = 'green';
-  else if (Math.abs(angle) < 10) element.style.color = 'orange';
-  else element.style.color = 'red';
-}
-
-// -----------------------------
-// Main battery update orchestration
-// - decide input (80% none), set sim.inputWatts & sim.chargeSource in one place
-// - update lastInputTime when sim.inputWatts > 0
-// - update all UI after values computed
-// -----------------------------
-function updateBatteryDisplay() {
-  // advance simulated time (15 minutes per second)
-  simulationMinutes += 15;
-  const totalMinutes = 6 * 60 + simulationMinutes;
-  const hours = Math.floor(totalMinutes / 60) % 24;
-  const minutes = totalMinutes % 60;
-  const timeInHours = totalMinutes / 60;
-
-  // update top right overlays
-  const timeEl = document.getElementById('timeDisplay');
-  if (timeEl) timeEl.textContent = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
-
-  const tempEl = document.getElementById('tempDisplay');
-  const tempSine = Math.sin((timeInHours - 6) * Math.PI / 12);
-  const temperature = 15 + 5 * tempSine;
-  if (tempEl) tempEl.textContent = Math.round(temperature) + '°C';
-
-  // Update battery levels (slight fluctuation)
-  for (let i = 0; i < batteries.length; i++) {
-    const change = (Math.random() - 0.5) * 4;
-    batteries[i].soc = +(Math.max(0, Math.min(100, batteries[i].soc + change))).toFixed(1);
-    batteries[i].volts = +(48 + (batteries[i].soc - 50) / 100 * 2 + (Math.random() * 0.2 - 0.1)).toFixed(1);
-    batteries[i].temp = Math.round(20 + Math.random() * 8);
-  }
-
-  // Simulate load (uses sin + noise)
-  const powerSine = Math.sin(timeInHours * Math.PI / 6);
-  const randomFactor = (Math.random() - 0.5) * 0.3;
-  sim.loadWatts = Math.round(-1200 - 400 * (powerSine + randomFactor));
-
-  // --- Decide input connection (80% none) ---
-  if (Math.random() < 0.8) {
-    sim.inputWatts = 0;
-    sim.chargeSource = 'none';
-  } else {
-    // 20% of the time we have a connection — choose a wattage
-    sim.inputWatts = Math.round(600 + 400 * Math.sin(timeInHours * Math.PI / 8) + Math.random() * 200);
-    // pick source based on time and magnitude
-    if (hours >= 6 && hours < 18 && sim.inputWatts > 200) sim.chargeSource = 'solar';
-    else if (sim.inputWatts > 500) sim.chargeSource = 'generator';
-    else sim.chargeSource = 'mains';
-  }
-
-  // track last input time (if input present)
-  if (sim.inputWatts > 0) lastInputTime = Date.now();
-
-  // compute derived values
-  const soc = getTotalSoC();
-  const bankV = getBankVoltage();
-  const netW = computePower();
-  const curA = getTotalCurrent();
-
-  // power history & spike detection
-  addToPowerHistory(netW);
-  if (detectSpike(netW)) {
-    spikeCount++;
-    addWarning(`Power spike detected: ${netW}W`, netW > 0 ? 'warning' : 'critical');
-  }
-
-  // update gauge and module UI
-  const gaugeText = document.getElementById('gaugeText');
-  if (gaugeText) gaugeText.textContent = soc.toFixed(1) + '%';
-  updateGauge(soc);
-  renderBatteryModules();
-
-  // update small stat fields
-  const netEl = document.getElementById('netPower');
-  if (netEl) netEl.textContent = (netW >= 0 ? `+${netW}` : netW) + 'W';
-  const inpEl = document.getElementById('inputPower');
-  if (inpEl) inpEl.textContent = (sim.inputWatts >= 0 ? `+${sim.inputWatts}` : sim.inputWatts) + 'W';
-  const loadEl = document.getElementById('loadPower');
-  if (loadEl) loadEl.textContent = `${sim.loadWatts}W`;
-  const bankEl = document.getElementById('bankVoltage');
-  if (bankEl) bankEl.textContent = bankV + 'V';
-  const curEl = document.getElementById('bankCurrent');
-  if (curEl) curEl.textContent = (curA >= 0 ? `+${curA}` : curA) + 'A';
-  const estEl = document.getElementById('estTime');
-  if (estEl) estEl.textContent = estimateTimeLeft();
-
-  // update charge source UI + charge time (synchronised)
-  updateChargeSourceUI();
-  const ct = calculateChargeTime();
-  // (calculateChargeTime already sets the #chargeTime element's text & visibility)
-
-  // update loads, warnings, spikes render
-  updateLoadBreakdown();
-  renderWarnings();
-
-  // battery warning checks
-  if (soc < 20) addWarning(`Low battery: ${soc.toFixed(1)}%`, 'warning');
-  if (soc < 10) addWarning(`Critical battery: ${soc.toFixed(1)}%`, 'critical');
-
-  batteries.forEach(b => {
-    if (b.temp > 35) addWarning(`Module ${b.id} overheating: ${b.temp}°C`, 'warning');
-    if (b.soc < 5) addWarning(`Module ${b.id} critical: ${b.soc.toFixed(1)}%`, 'critical');
-  });
-
-  // high load warnings
-  if (sim.loads.hvac > 1200) addWarning('HVAC high consumption', 'warning');
-  if (Math.abs(sim.loadWatts) > 2000) addWarning('Total load exceeding capacity', 'critical');
-}
-
-// -----------------------------
-// Combined update loop (seconds)
-// -----------------------------
-setInterval(() => {
-  // Pitch/roll/tank simulation
-  document.getElementById('tankPercent').innerText = `(${Math.round(waterLevel)}%)`;
-
-  if (Math.random() < 0.4) pitchDir *= -1;
-  pitch += pitchDir * (Math.random() * 2);
-  pitch = Math.max(-15, Math.min(15, pitch));
-
-  if (Math.random() < 0.4) rollDir *= -1;
-  roll += rollDir * (Math.random() * 2);
-  roll = Math.max(-15, Math.min(15, roll));
-
-  const pitchContainer = document.getElementById('pitchContainer');
-  const rollContainer = document.getElementById('rollContainer');
-  if (pitchContainer) pitchContainer.style.transform = `rotate(${pitch}deg)`;
-  if (rollContainer) rollContainer.style.transform = `rotate(${roll}deg)`;
-
-  const pitchVal = document.getElementById('pitchValue');
-  const rollVal = document.getElementById('rollValue');
-  if (pitchVal) pitchVal.innerText = `Pitch: ${pitch.toFixed(1)}°`;
-  if (rollVal) rollVal.innerText = `Roll: ${roll.toFixed(1)}°`;
-
-  updateColor(pitchVal, pitch);
-  updateColor(rollVal, roll);
-
-  updateTank(pitch);
-
-  // Battery/power updates
-  updateBatteryDisplay();
-}, 100);
-
-// -----------------------------
-// Initialize UI once
-// -----------------------------
-renderBatteryModules();
-updateBatteryDisplay();
-
-</script>
+
+    <!-- Chat Interface -->
+    <div class="chat-container" id="chatContainer">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="channel-selector">
+                <select class="channel-name" id="channelSelector" onchange="switchChannel()">
+                    <option value="general"># general</option>
+                    <option value="random"># random</option>
+                    <option value="bots"># bots</option>
+                </select>
+            </div>
+            <button class="account-btn" onclick="openAccountModal()">Account</button>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="messages-container" id="messagesContainer">
+                <!-- Messages will be dynamically added here -->
+            </div>
+
+            <!-- Input Bar -->
+            <div class="input-bar">
+                <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+                <div class="input-buttons">
+                    <button class="input-btn" onclick="document.getElementById('imageInput').click()" title="Upload Image">📷</button>
+                    <button class="input-btn" onclick="sendMessage()" title="Send Message">➤</button>
+                </div>
+                <input type="file" id="imageInput" class="image-input" accept="image/*" onchange="handleImageUpload(event)">
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Modal -->
+    <div class="modal" id="accountModal">
+        <div class="modal-content">
+            <h2>Account Settings</h2>
+            <div class="form-group">
+                <label>Display Name</label>
+                <input type="text" id="displayName" placeholder="Enter your name">
+            </div>
+            <div class="form-group">
+                <label>Profile Picture</label>
+                <input type="file" id="profilePicFile" accept="image/*" onchange="handleProfilePicUpload(event)">
+                <small style="color: #888; font-size: 12px;">Upload an image file for your profile picture</small>
+            </div>
+            <div class="profile-preview" id="profilePreview">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%234a90e2'/%3E%3Ctext x='40' y='45' text-anchor='middle' fill='white' font-size='30'%3EU%3C/text%3E%3C/svg%3E" alt="Profile">
+                <div>Current Profile</div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeAccountModal()">Cancel</button>
+                <button class="modal-btn primary" onclick="saveAccount()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App State
+        let currentUser = {
+            name: 'User',
+            avatar: null
+        };
+        
+        let currentChannel = 'general';
+        let messages = {
+            general: [],
+            random: [],
+            bots: []
+        };
+
+        // Custom emojis mapping
+        const customEmojis = {
+            ':smile:': '😊',
+            ':heart:': '❤️',
+            ':fire:': '🔥',
+            ':thumbs_up:': '👍',
+            ':party:': '🎉',
+            ':rocket:': '🚀',
+            ':wave:': '👋',
+            ':star:': '⭐'
+        };
+
+        // Bot system
+        class ChatBot {
+            constructor(name, avatar, trigger, response) {
+                this.name = name;
+                this.avatar = avatar;
+                this.trigger = trigger;
+                this.response = response;
+            }
+
+            shouldRespond(message) {
+                if (typeof this.trigger === 'string') {
+                    return message.toLowerCase().includes(this.trigger.toLowerCase());
+                }
+                return this.trigger.test(message);
+            }
+
+            generateResponse(message) {
+                if (typeof this.response === 'string') {
+                    return this.response;
+                }
+                return this.response(message);
+            }
+        }
+
+        // Initialize bots
+        const bots = [
+            new ChatBot('WelcomeBot', '🤖', 'hello', 'Welcome to ChatApp! 👋 Type "help" for commands.'),
+            new ChatBot('HelpBot', '💡', 'help', 'Available commands:\n• Type "hello" for a welcome message\n• Type "time" for current time\n• Type "quote" for a random quote\n• Type "echo [message]" to have EchoBot repeat it'),
+            new ChatBot('TimeBot', '⏰', 'time', () => `Current time: ${new Date().toLocaleTimeString()}`),
+            new ChatBot('QuoteBot', '📝', 'quote', () => {
+                const quotes = [
+                    "The only way to do great work is to love what you do. - Steve Jobs",
+                    "Innovation distinguishes between a leader and a follower. - Steve Jobs",
+                    "Life is what happens to you while you're busy making other plans. - John Lennon",
+                    "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt"
+                ];
+                return quotes[Math.floor(Math.random() * quotes.length)];
+            }),
+            new ChatBot('EchoBot', '🔁', /^echo\s+(.+)/i, (message) => {
+                const match = message.match(/^echo\s+(.+)/i);
+                return match ? `${match[1]} 🔄` : 'Please provide something to echo! Try: "echo Hello World"';
+            })
+        ];
+
+        // Initialize app
+        function joinRoom() {
+            const roomCode = document.getElementById('roomCodeInput').value;
+            if (roomCode === '1234') {
+                document.getElementById('roomScreen').style.display = 'none';
+                document.getElementById('chatContainer').style.display = 'flex';
+                
+                // Add welcome message
+                addSystemMessage('Welcome to ChatApp! 🎉');
+                
+                // Focus on message input
+                document.getElementById('messageInput').focus();
+            } else {
+                alert('Invalid room code. Please enter: 1234');
+            }
+        }
+
+        function addSystemMessage(text) {
+            const message = {
+                id: Date.now(),
+                user: 'System',
+                avatar: '🔔',
+                text: text,
+                timestamp: new Date(),
+                isSystem: true
+            };
+            messages[currentChannel].push(message);
+            renderMessages();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            const message = {
+                id: Date.now(),
+                user: currentUser.name,
+                avatar: currentUser.avatar || currentUser.name.charAt(0).toUpperCase(),
+                text: text,
+                timestamp: new Date()
+            };
+
+            messages[currentChannel].push(message);
+            input.value = '';
+            renderMessages();
+
+            // Check for bot responses
+            setTimeout(() => checkBotResponses(text), 500);
+        }
+
+        function checkBotResponses(messageText) {
+            for (const bot of bots) {
+                if (bot.shouldRespond(messageText)) {
+                    const botMessage = {
+                        id: Date.now() + Math.random(),
+                        user: bot.name,
+                        avatar: bot.avatar,
+                        text: bot.generateResponse(messageText),
+                        timestamp: new Date(),
+                        isBot: true
+                    };
+                    messages[currentChannel].push(botMessage);
+                    renderMessages();
+                    break; // Only one bot responds at a time
+                }
+            }
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messagesContainer');
+            const channelMessages = messages[currentChannel];
+            
+            container.innerHTML = '';
+            
+            channelMessages.forEach(message => {
+                const messageEl = createMessageElement(message);
+                container.appendChild(messageEl);
+            });
+            
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function createMessageElement(message) {
+            const div = document.createElement('div');
+            div.className = `message ${message.isBot ? 'bot' : ''} ${message.isSystem ? 'system' : ''}`;
+            
+            const avatarEl = document.createElement('div');
+            avatarEl.className = 'message-avatar';
+            
+            if (message.avatar && message.avatar.startsWith('http')) {
+                const img = document.createElement('img');
+                img.src = message.avatar;
+                img.alt = message.user;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.borderRadius = '50%';
+                avatarEl.appendChild(img);
+            } else {
+                avatarEl.textContent = message.avatar || message.user.charAt(0).toUpperCase();
+            }
+
+            const contentEl = document.createElement('div');
+            contentEl.className = 'message-content';
+
+            const headerEl = document.createElement('div');
+            headerEl.className = 'message-header';
+            
+            const usernameEl = document.createElement('span');
+            usernameEl.className = 'message-username';
+            usernameEl.textContent = message.user;
+            
+            const timestampEl = document.createElement('span');
+            timestampEl.className = 'message-timestamp';
+            timestampEl.textContent = formatTime(message.timestamp);
+            
+            headerEl.appendChild(usernameEl);
+            headerEl.appendChild(timestampEl);
+
+            const bubbleEl = document.createElement('div');
+            bubbleEl.className = 'message-bubble';
+            
+            if (message.image) {
+                const img = document.createElement('img');
+                img.src = message.image;
+                img.className = 'message-image';
+                img.onclick = () => window.open(message.image, '_blank');
+                bubbleEl.appendChild(img);
+            }
+            
+            if (message.text) {
+                bubbleEl.innerHTML += formatMessage(message.text);
+            }
+
+            contentEl.appendChild(headerEl);
+            contentEl.appendChild(bubbleEl);
+            
+            div.appendChild(avatarEl);
+            div.appendChild(contentEl);
+
+            return div;
+        }
+
+        function formatMessage(text) {
+            // Replace custom emojis
+            Object.keys(customEmojis).forEach(emoji => {
+                const regex = new RegExp(escapeRegExp(emoji), 'g');
+                text = text.replace(regex, customEmojis[emoji]);
+            });
+            
+            // Format text
+            text = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/```([^`]+)```/g, '<pre><code>$1</code></pre>');
+            
+            return text;
+        }
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const message = {
+                    id: Date.now(),
+                    user: currentUser.name,
+                    avatar: currentUser.avatar || currentUser.name.charAt(0).toUpperCase(),
+                    image: e.target.result,
+                    text: '',
+                    timestamp: new Date()
+                };
+
+                messages[currentChannel].push(message);
+                renderMessages();
+            };
+            reader.readAsDataURL(file);
+            
+            // Reset input
+            event.target.value = '';
+        }
+
+        function switchChannel() {
+            currentChannel = document.getElementById('channelSelector').value;
+            renderMessages();
+        }
+
+        function openAccountModal() {
+            document.getElementById('displayName').value = currentUser.name;
+            updateProfilePreview();
+            document.getElementById('accountModal').style.display = 'block';
+        }
+
+        function handleProfilePicUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentUser.avatar = e.target.result;
+                updateProfilePreview();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function closeAccountModal() {
+            document.getElementById('accountModal').style.display = 'none';
+        }
+
+        function updateProfilePreview() {
+            const name = document.getElementById('displayName').value || 'User';
+            const preview = document.getElementById('profilePreview');
+            const img = preview.querySelector('img');
+            
+            if (currentUser.avatar) {
+                img.src = currentUser.avatar;
+            } else {
+                img.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%234a90e2'/%3E%3Ctext x='40' y='45' text-anchor='middle' fill='white' font-size='30'%3E${name.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
+            }
+        }
+
+        function saveAccount() {
+            const name = document.getElementById('displayName').value || 'User';
+            
+            currentUser.name = name;
+            // Avatar is already updated by handleProfilePicUpload
+            
+            closeAccountModal();
+        }
+
+        // Event listeners
+        document.getElementById('displayName').addEventListener('input', updateProfilePreview);
+
+        // Close modal when clicking outside
+        document.getElementById('accountModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeAccountModal();
+            }
+        });
+
+        // Initialize
+        document.getElementById('roomCodeInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                joinRoom();
+            }
+        });
+    </script>
 </body>
 </html>
