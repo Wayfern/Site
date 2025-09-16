@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bus Display Monitor</title>
+<title>Bus Pitch & Roll Display + Battery Monitor</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   :root{
@@ -63,6 +63,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: stretch;
+    border-bottom: none;
     height: 30.20mm;
     margin-left: 102px; 
   }
@@ -292,7 +293,7 @@
     align-items: center;
     padding: 2px 6px;
     border-radius: 2px;
-    font-size: 7px;
+    font-size: 6px;
   }
 
   .warning-critical {
@@ -317,7 +318,7 @@
 
   .warning-time {
     color: var(--muted);
-    font-size: 7px;
+    font-size: 6px;
   }
 
   .no-warnings {
@@ -971,13 +972,16 @@ setInterval(() => {
   if (Math.random() < 0.4) pitchDir *= -1;
   pitch += pitchDir * (Math.random() * 2);
   pitch = Math.max(-15, Math.min(15, pitch));
+
   if (Math.random() < 0.4) rollDir *= -1;
   roll += rollDir * (Math.random() * 2);
   roll = Math.max(-15, Math.min(15, roll));
+
   const pitchContainer = document.getElementById('pitchContainer');
   const rollContainer = document.getElementById('rollContainer');
   if (pitchContainer) pitchContainer.style.transform = `rotate(${pitch}deg)`;
   if (rollContainer) rollContainer.style.transform = `rotate(${roll}deg)`;
+
   const pitchVal = document.getElementById('pitchValue');
   const rollVal = document.getElementById('rollValue');
   if (pitchVal) pitchVal.innerText = `Pitch: ${pitch.toFixed(1)}°`;
@@ -985,7 +989,9 @@ setInterval(() => {
 
   updateColor(pitchVal, pitch);
   updateColor(rollVal, roll);
+
   updateTank(pitch);
+
   updateBatteryDisplay();
 }, 50);
 
