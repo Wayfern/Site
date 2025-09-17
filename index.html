@@ -252,7 +252,7 @@ function updateChargeSourceUI() {
     sourceDetails.textContent = '0W';
     sourceDetails.style.visibility = 'hidden';
         break;}}
-        // ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
 // Battery modules rendering & gauge
 // ---------------------------------------------------------------------
 function getColorVar(soc){
@@ -327,7 +327,7 @@ function addWarning(text,type='warning'){
         if(warnings.some(w=>w.text===text&&(now-w.timestamp)<30000))
         return;warnings.unshift({text,type,timestamp:now,time:
         new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit'})});
-        if(warnings.length>5)warnings.pop();}
+        if(warnings.length>6)warnings.pop();}
         
 function renderWarnings(){
     const warningsList=document.getElementById('warningsList');
