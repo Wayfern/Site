@@ -62,12 +62,12 @@ body { background:black; display:flex; justify-content:center; align-items:cente
 .tire-ring-compact svg { width:32px; height:32px; }
 .tire-label-compact { font-family:sans-serif; font-size:5px; color:var(--muted); margin-top:1px; text-align:center; line-height:1; }
 .status-grid { display:flex; flex-direction:column; gap:1px; }
-.warning-item { display:flex; justify-content:space-between; align-items:center; padding:2px 6px; border-radius:2px; font-size:6px; }
+.warning-item { display:flex; justify-content:space-between; align-items:center; padding:2px 3px; border-radius:2px; font-size:5px; }
 .warning-critical { background:rgba(255,92,92,0.2); border-left:3px solid var(--bad); }
 .warning-warning { background:rgba(255,159,26,0.2); border-left:3px solid var(--warn); }
 .warning-info { background:rgba(77,208,225,0.2); border-left:3px solid var(--accent); }
 .warning-text { flex:1; color:var(--text); }
-.warning-time { color:var(--muted); font-size:6px; }
+.warning-time { color:var(--muted); font-size:5px; }
 .no-warnings { text-align:center; color:var(--good); font-weight:bold; padding:8px; font-size:10px; }
 .time-display { position:absolute; top:4px; right:6px; color:var(--accent); font-family:sans-serif; font-size:14px; }
 .temp-display { position:absolute; bottom:4px; right:6px; color:#fff; font-family:sans-serif; font-size:12px; }
@@ -163,12 +163,12 @@ let batteries=[
   {id:3,soc:+(60+Math.random()*40).toFixed(1),volts:47.9,temp:21},
   {id:4,soc:+(60+Math.random()*40).toFixed(1),volts:48.0,temp:22}];
 let tires=[
-  {id:'FL',position:'Front Left',pressure:35+Math.random()*5},
-  {id:'FR',position:'Front Right',pressure:35+Math.random()*5},
-  {id:'ML',position:'Mid Left',pressure:35+Math.random()*5},
-  {id:'MR',position:'Mid Right',pressure:35+Math.random()*5},
-  {id:'RL',position:'Rear Left',pressure:35+Math.random()*5},
-  {id:'RR',position:'Rear Right',pressure:35+Math.random()*5}];
+  {id:'Front Left',position:'Front Left',pressure:35+Math.random()*5},
+  {id:'Rear Left In',position:'Rear Left In',pressure:35+Math.random()*5},
+  {id:'Rear Left Out',position:'Rear Left Out',pressure:35+Math.random()*5},
+  {id:'Front Right',position:'Front Right',pressure:35+Math.random()*5},
+  {id:'Rear Right In',position:'Rear Right In',pressure:35+Math.random()*5},
+  {id:'Rear Right Out',position:'Rear Right Out',pressure:35+Math.random()*5}];
 let sim={inputWatts:800,loadWatts:-1650,chargeSource:'solar',loads:{lights:120,fridge:180,hvac:850,electronics:95,other:405}};
 let powerHistory=[],warnings=[],spikeCount=0;
 let lastInputTime=Date.now(),lastChargeSourceUpdate=0;
@@ -252,7 +252,7 @@ function updateChargeSourceUI() {
     sourceDetails.textContent = '0W';
     sourceDetails.style.visibility = 'hidden';
         break;}}
-// ---------------------------------------------------------------------
+        // ---------------------------------------------------------------------
 // Battery modules rendering & gauge
 // ---------------------------------------------------------------------
 function getColorVar(soc){
@@ -353,7 +353,8 @@ function updateLoadBreakdown(){
     const totalLoads=Object.values(sim.loads).reduce((s,l)=>s+l,0);
     sim.loads.other=Math.abs(sim.loadWatts)-(totalLoads-sim.loads.other);
     sim.loads.other=Math.max(0,sim.loads.other);const setText=(id,text)=>{
-    const el=document.getElementById(id);if(el)el.textContent=text;};setText('lightsLoad',`-${sim.loads.lights}W`);
+    const el=document.getElementById(id);if(el)el.textContent=text;};
+    setText('lightsLoad',`-${sim.loads.lights}W`);
     setText('fridgeLoad',`-${sim.loads.fridge}W`);
     setText('hvacLoad',`-${sim.loads.hvac}W`);
     setText('electronicsLoad',`-${sim.loads.electronics}W`);
@@ -376,7 +377,9 @@ function updateTank(pitchAngle){
 // Colour helpers
 // ---------------------------------------------------------------------
 function updateColor(element,angle){
-        if(!element)return;if(Math.abs(angle)<5)element.style.color='green';
+        if(!element)
+        return;
+        if(Math.abs(angle)<5)element.style.color='green';
         else if(Math.abs(angle)<10)element.style.color='orange';
         else element.style.color='red';}
 // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
