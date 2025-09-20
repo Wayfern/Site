@@ -1,143 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WIP Code Files</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #fafafa;
-        }
-        
-        h1 {
-            margin-bottom: 30px;
-            color: #222;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-        
-        .code-item {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .code-title {
-            font-size: 1.3em;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-        
-        .code-description {
-            margin-bottom: 15px;
-            color: #666;
-        }
-        
-        .code-links {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .code-links a {
-            color: #0066cc;
-            text-decoration: none;
-            font-size: 0.9em;
-            padding: 6px 12px;
-            border: 1px solid #0066cc;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-        
-        .code-links a:hover {
-            background: #0066cc;
-            color: white;
-        }
-        
-        .add-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #0066cc;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        
-        .add-button:hover {
-            background: #0052a3;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WIP Code Files</title>
+<style>
+    * {margin: 0;padding: 0;box-sizing: border-box;}
+    body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;line-height: 1.6;color: #333;max-width: 800px;margin: 0 auto;padding: 20px;background: #fafafa;}
+    h1 {margin-bottom: 30px;color: #222;border-bottom: 2px solid #eee;padding-bottom: 10px;}
+    .code-item {background: white;border: 1px solid #ddd;border-radius: 6px;margin-bottom: 20px;padding: 20px;box-shadow: 0 1px 3px rgba(0,0,0,0.1);}
+    .code-title {font-size: 1.3em;font-weight: 600;margin-bottom: 8px;color: #333;}
+    .code-description {margin-bottom: 15px;color: #666;}
+    .code-links {display: flex;gap: 15px;}
+    .code-links a {color: #0066cc;text-decoration: none;font-size: 0.9em;padding: 6px 12px;border: 1px solid #0066cc;border-radius: 4px;transition: all 0.2s;}
+    .code-links a:hover {background: #0066cc;color: white;}
+</style>
 </head>
 <body>
     <h1>Code Files</h1>
-    
     <div class="code-item">
         <div class="code-title">Main Bus Display</div>
         <div class="code-description">A display to show data about the bus. nothing more nothing less</div>
-        <div class="code-links">
-            <a href="https://wayfern.github.io/Code/" target="_blank">View</a>
-            <a href="https://github.com/Wayfern/Code/blob/main/index.html" target="_blank">Code File</a>
+        <div class="code-links"><a href="https://wayfern.github.io/Code/" target="_blank">View</a><a href="https://github.com/Wayfern/Code/blob/main/index.html" target="_blank">Code File</a>
         </div>
     </div>
-    
     <div class="code-item">
         <div class="code-title">Telegram Bot</div>
         <div class="code-description">This will most likely be replaced by a custom sytem however this is used to comunicate with the bus sytems externaly from anywhere. at the moment this is all faked data and logic however that will chnage soon :) it needs a pasword to use it so L to you lot ig lol</div>
-        <div class="code-links">
-            <a href="https://github.com/Wayfern/Code/blob/main/telegram%20bot.py" target="_blank">Code File</a>
+        <div class="code-links"><a href="https://github.com/Wayfern/Code/blob/main/telegram%20bot.py" target="_blank">Code File</a>
         </div>
     </div>
-    
-    <button class="add-button" onclick="addNewItem()">+</button>
-    
-    <script>
-        function addNewItem() {
-            const title = prompt('Code title:');
-            if (!title) return;
-            
-            const description = prompt('Description:');
-            if (!description) return;
-            
-            const repoLink = prompt('link:');
-            if (!repoLink) return;
-            
-            const codeLink = prompt('link:');
-            if (!codeLink) return;
-            
-            const newItem = document.createElement('div');
-            newItem.className = 'code-item';
-            newItem.innerHTML = `
-                <div class="code-title">${title}</div>
-                <div class="code-description">${description}</div>
-                <div class="code-links">
-                    <a href="${repoLink}" target="_blank">link</a>
-                    <a href="${codeLink}" target="_blank">link</a>
-                </div>
-            `;
-            
-            document.querySelector('.add-button').parentNode.insertBefore(newItem, document.querySelector('.add-button'));
-        }
-    </script>
 </body>
 </html>
