@@ -25,6 +25,14 @@
   .social-header i {font-size: 22px;margin-right: 10px;}
   .social-name {font-size: 15px;font-weight: bold;}
   .social-desc {font-size: 14px;color: #333;margin: 0;}
+  .code-card {display: flex;flex-direction: column;background-color: var(--beige);padding: 15px;margin-bottom: 15px;border-radius: 8px;box-shadow: 0 3px 6px rgba(0,0,0,0.3);color: var(--dark);}
+  .code-header {display: flex;align-items: center;margin-bottom: 6px;}
+  .code-header i {font-size: 22px;margin-right: 10px;}
+  .code-name {font-size: 15px;font-weight: bold;}
+  .code-desc {font-size: 14px;margin: 6px 0 12px 0;}
+  .code-links {display: flex;gap: 12px;}
+  .code-links a {color: var(--dark);text-decoration: none;font-size: 13px;padding: 6px 10px;border: 1px solid var(--dark);border-radius: 4px;transition: all 0.2s ease;}
+  .code-links a:hover {background: var(--dark);color: var(--white);}
 </style></head><body>
   <div class="hero">
   <img class="hero-img" src="IMG_5999.jpg" alt="Wayfern banner"></div>
@@ -38,13 +46,9 @@
         <div class="card-body">
         <div id="about" class="section active">
         <h2>About</h2>
-        <p>Site WIP sorry for any problems</p></div>
-        <div id="systems" class="section">
-        <h2>Systems</h2>
-        <p>WIP</p></div>
-        <div id="socials" class="section">
-        <h2>Socials</h2>
-        <div id="socials-container"></div>
+        <p>About section text here.</p></div>
+        <div id="systems" class="section"></div>
+        <div id="socials" class="section"><div id="socials-container"></div>
         </div>
       </div>
     </div>
@@ -61,19 +65,15 @@
     const rect = tab.getBoundingClientRect();
     const parentRect = tab.parentElement.getBoundingClientRect();
     highlight.style.left = (rect.left - parentRect.left) + "px";
-    highlight.style.width = rect.width + "px";
-  }
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => activateTab(tab));
-  });
-  window.addEventListener('load', () => {
+    highlight.style.width = rect.width + "px";}
+    tabs.forEach(tab => {
+    tab.addEventListener('click', () => activateTab(tab));});
+    window.addEventListener('load', () => {
     const active = document.querySelector('.tab-btn.active');
-    if (active) activateTab(active);
-  });
-  window.addEventListener('resize', () => {
+    if (active) activateTab(active);});
+    window.addEventListener('resize', () => {
     const active = document.querySelector('.tab-btn.active');
-    if (active) activateTab(active);
-  });
+    if (active) activateTab(active);});
   const socialsData = {
   "socials": [
     { "name": "YouTube","icon":"fab fa-youtube","url": "https://youtube.com/@wayfernn","desc": "Long form videos, shorts and the main project updates."},
@@ -81,8 +81,7 @@
     { "name": "Twitter","icon": "fab fa-x-twitter","url": "https://x.com/wayfernn","desc": "Quick updates and the odd rant or two"},
     { "name": "TikTok","icon": "fab fa-tiktok","url": "https://www.tiktok.com/@wayfernn","desc": "Short clips and fun moments."},
     { "name": "GitHub","icon": "fab fa-github","url": "https://github.com/Wayfern","desc": "Code for the systems and open source projects (eg: the Telegram bot)"},
-    { "name": "Discord","icon": "fab fa-discord","url": "https://discord.gg/9mjaNzFKuY","desc": "Community chat and discussions! And juts a place to hang out and see things hapen in realtime"}
-  ]};
+    { "name": "Discord","icon": "fab fa-discord","url": "https://discord.gg/9mjaNzFKuY","desc": "Community chat and discussions! And juts a place to hang out and see things hapen in realtime"}]};
   const container = document.getElementById('socials-container');
   socialsData.socials.forEach(social => {
   const card = document.createElement('div');
@@ -91,6 +90,20 @@
     <div class="social-header"><i class="${social.icon}"></i>&ensp;<span class="social-name">${social.name}</span></div><p class="social-desc">${social.desc}</p>`;
   card.onclick = () => window.open(social.url, '_blank');
   container.appendChild(card);});
+  const systemsData = [
+    { icon: "fas fa-globe",name: "This Website",desc: "The central hub for the project.",links: [{ label: "View", url: "https://wayfern.github.io/Site/" },{ label: "Code File", url: "https://github.com/Wayfern/Site/blob/main/index.html" }]},
+    { icon: "fas fa-desktop",name: "Main Bus Display",desc: "A display to show data about the bus. Nothing more nothing less.",links: [{ label: "View", url: "https://wayfern.github.io/Code/" },{ label: "Code File", url: "https://github.com/Wayfern/Code/blob/main/index.html" }]},
+    { icon: "fas fa-robot",name: "Telegram Bot",desc: "Used to communicate with the bus systems externally. Currently runs on fake data but will be replaced soon. Password protected.",links: [{ label: "Code File", url: "https://github.com/Wayfern/Code/blob/main/telegram%20bot.py" }]}];
+  function loadSystems() {
+  const container = document.getElementById("systems");
+  container.innerHTML = "";
+  systemsData.forEach(sys => {
+    const card = document.createElement("div");
+    card.className = "code-card";
+    card.innerHTML = `
+    <div class="code-header"><i class="${sys.icon}"></i>&ensp;<span class="code-name">${sys.name}</span></div><p class="code-desc">${sys.desc}</p><div class="code-links">${sys.links.map(link => `<a href="${link.url}" target="_blank">${link.label}</a>`).join("")}</div>`;
+    container.appendChild(card);});}
+    document.addEventListener("DOMContentLoaded", loadSystems);
 </script>
 </body>
 </html>
