@@ -1,36 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WIP Code Files</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
 <style>
-    * {margin: 0;padding: 0;box-sizing: border-box;}
-    body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;line-height: 1.6;color: #333;max-width: 800px;margin: 0 auto;padding: 20px;background: #fafafa;}
-    h1 {margin-bottom: 30px;color: #222;border-bottom: 2px solid #eee;padding-bottom: 10px;}
-    .code-item {background: white;border: 1px solid #ddd;border-radius: 6px;margin-bottom: 20px;padding: 20px;box-shadow: 0 1px 3px rgba(0,0,0,0.1);}
-    .code-title {font-size: 1.3em;font-weight: 600;margin-bottom: 8px;color: #333;}
-    .code-description {margin-bottom: 15px;color: #666;}
-    .code-links {display: flex;gap: 15px;}
-    .code-links a {color: #0066cc;text-decoration: none;font-size: 0.9em;padding: 6px 12px;border: 1px solid #0066cc;border-radius: 4px;transition: all 0.2s;}
-    .code-links a:hover {background: #0066cc;color: white;}
-</style>
-</head>
-<body>
-    <h1>Code Files</h1>
-    <div class="code-item">
-        <div class="code-title">Main Bus Display</div>
-        <div class="code-description">A display to show data about the bus. nothing more nothing less</div>
-        <div class="code-links"><a href="https://wayfern.github.io/Code/" target="_blank">View</a><a href="https://github.com/Wayfern/Code/blob/main/index.html" target="_blank">Code File</a></div>
+  :root {--beige: #DCD6C8;--brown: #a87452;--dark: #2e3639;--tab-highlight: #47605f;--white: #ffffff;}
+   body {margin: 0;background: var(--beige);font-family: "Playfair Display", Georgia, serif;color: var(--white);}
+  .hero {background: var(--beige);text-align: center;padding: 20px 0;}
+  .hero-img {max-width: 760px;width: 100%;height: auto;display: inline-block;}
+  .bottom {background: var(--brown);display: flex;justify-content: center;padding: 40px 20px;box-sizing: border-box;}
+  .card {background: var(--dark);width: 100%;max-width: 600px;min-height: 1000px;position: relative;box-shadow: 0 4px 10px rgba(0,0,0,1);}
+  .tabs {display: flex;justify-content: flex-start;position: relative;background: var(--dark);}
+  .tab-highlight {position: absolute;top: 0;left: 0;height: 100%;width: 0;background: var(--tab-highlight);transition: all 0.25s ease;z-index: 0;}
+  .tab-btn {flex: 1;border: none;background: transparent;color: var(--white);font-family: "Great Vibes", cursive;font-size: 28px;padding: 12px 0;cursor: pointer;position: relative;z-index: 1;}
+  .tab-btn.active {font-weight: bold;}
+  .card-body {padding: 20px;}
+  .section {display: none;}
+  .section.active {display: block;}
+  .social-card {display: flex;flex-direction: column;background-color: var(--beige);padding: 15px;margin-bottom: 15px;border-radius: 8px;box-shadow: 0 3px 6px rgba(0,0,0,0.3);cursor: pointer;transition: transform 0.2s ease;color: var(--dark);}
+  .social-card:hover {transform: scale(1.02);}
+  .social-header {display: flex;align-items: center;margin-bottom: 6px;}
+  .social-header i {font-size: 22px;margin-right: 10px;}
+  .social-name {font-size: 15px;font-weight: bold;}
+  .social-desc {font-size: 14px;color: #333;margin: 0;}
+</style></head><body>
+  <div class="hero">
+  <img class="hero-img" src="IMG_5999.jpg" alt="Wayfern banner"></div>
+  <div class="bottom">
+    <div class="card">
+      <div class="tabs" id="tabsRoot">
+        <div class="tab-highlight" id="tabHighlight"></div>
+        <button class="tab-btn active" data-target="about">About</button>
+        <button class="tab-btn" data-target="systems">Systems</button>
+        <button class="tab-btn" data-target="socials">Socials</button></div>
+        <div class="card-body">
+        <div id="about" class="section active">
+        <h2>About</h2>
+        <p>Site WIP sorry for any problems</p></div>
+        <div id="systems" class="section">
+        <h2>Systems</h2>
+        <p>WIP</p></div>
+        <div id="socials" class="section">
+        <h2>Socials</h2>
+        <div id="socials-container"></div>
+        </div>
+      </div>
     </div>
-    <div class="code-item">
-        <div class="code-title">Telegram Bot</div>
-        <div class="code-description">This will most likely be replaced by a custom sytem however this is used to comunicate with the bus sytems externaly from anywhere. at the moment this is all faked data and logic however that will chnage soon :) it needs a pasword to use it so L to you lot ig lol</div>
-        <div class="code-links"><a href="https://github.com/Wayfern/Code/blob/main/telegram%20bot.py" target="_blank">Code File</a></div>
-    </div>
-    <div class="code-item">
-        <div class="code-title">Code File Site</div>
-        <div class="code-description">This site your useing right now</div>
-        <div class="code-links"><a href="https://github.com/Wayfern/Site/blob/main/index.html" target="_black">Code File</a></div>
+  </div>
+<script>
+  const tabs = document.querySelectorAll('.tab-btn');
+  const highlight = document.getElementById('tabHighlight');
+  const sections = document.querySelectorAll('.section');
+  function activateTab(tab) {
+    tabs.forEach(b => b.classList.remove('active'));
+    tab.classList.add('active');
+    sections.forEach(s => s.classList.remove('active'));
+    document.getElementById(tab.dataset.target).classList.add('active');
+    const rect = tab.getBoundingClientRect();
+    const parentRect = tab.parentElement.getBoundingClientRect();
+    highlight.style.left = (rect.left - parentRect.left) + "px";
+    highlight.style.width = rect.width + "px";
+  }
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => activateTab(tab));
+  });
+  window.addEventListener('load', () => {
+    const active = document.querySelector('.tab-btn.active');
+    if (active) activateTab(active);
+  });
+  window.addEventListener('resize', () => {
+    const active = document.querySelector('.tab-btn.active');
+    if (active) activateTab(active);
+  });
+  const socialsData = {
+  "socials": [
+    { "name": "YouTube","icon":"fab fa-youtube","url": "https://youtube.com/@wayfernn","desc": "Long form videos, shorts and the main project updates."},
+    { "name": "Instagram","icon":"fab fa-instagram","url": "https://www.instagram.com/way.fernn","desc": "Photos and short clips."},
+    { "name": "Twitter","icon": "fab fa-x-twitter","url": "https://x.com/wayfernn","desc": "Quick updates and the odd rant or two"},
+    { "name": "TikTok","icon": "fab fa-tiktok","url": "https://www.tiktok.com/@wayfernn","desc": "Short clips and fun moments."},
+    { "name": "GitHub","icon": "fab fa-github","url": "https://github.com/Wayfern","desc": "Code for the systems and open source projects (eg: the Telegram bot)"},
+    { "name": "Discord","icon": "fab fa-discord","url": "https://discord.gg/9mjaNzFKuY","desc": "Community chat and discussions! And juts a place to hang out and see things hapen in realtime"}
+  ]};
+  const container = document.getElementById('socials-container');
+  socialsData.socials.forEach(social => {
+  const card = document.createElement('div');
+  card.className = 'social-card';
+  card.innerHTML = `
+    <div class="social-header"><i class="${social.icon}"></i>&ensp;<span class="social-name">${social.name}</span></div><p class="social-desc">${social.desc}</p>`;
+  card.onclick = () => window.open(social.url, '_blank');
+  container.appendChild(card);});
+</script>
 </body>
 </html>
